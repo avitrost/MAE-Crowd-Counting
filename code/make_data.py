@@ -1,20 +1,24 @@
 import random
+from copy import deepcopy
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import scipy
 from PIL import Image
+from torch import Tensor
+from torch.utils.data import Dataset
 
-DATASET_ROOT = Path("./jhu_crowd_v2.0") # Should point to a directory containing extracted JHU-CROWD++ data set
+
+DATASET_ROOT = Path("./data/eset/jhu_crowd_v2.0") # Should point to a directory containing extracted JHU-CROWD++ data set
 CACHE_ROOT = Path("./cache") # Directory to cache generated density maps
 MODEL_SAVE_PATH = "./model.pt"
 CHECKPOINTS_DIR = "./checkpoints"
 SEED = 42
+
 
 def load_dataset_paths(dataset_root: Path, img_extensions: set) -> List[Tuple[Path, Path]]:
     images_path = dataset_root / "images"
@@ -133,6 +137,7 @@ def seed_worker(worker_id: int) -> None:
     np.random.seed(worker_seed)
     random.seed(worker_seed)
 
+
 class JHUCrowdDataset(Dataset):
     img_extensions = {".jpg"}
 
@@ -168,7 +173,7 @@ class JHUCrowdDataset(Dataset):
 
         if force_pregenerate and cache:
             self.pregenerate_density_maps()
-
+    
     def load_img_labels(self, dataset_root: Path) -> pd.DataFrame:
         # Load image_labels.txt
         img_info_df = pd.read_csv(
@@ -193,6 +198,7 @@ class JHUCrowdDataset(Dataset):
         assert all(img_info_df["count"].eq(gt_counts))
 
         return pd.concat([img_gt_paths_df, gt_labels, img_info_df], axis=1)
+
 
     def pregenerate_density_maps(self) -> None:
         with Pool(self.num_workers) as p:
@@ -232,103 +238,10 @@ class JHUCrowdDataset(Dataset):
     def __len__(self) -> int:
         return len(self.img_labels_df)
 
-    @staticmethod
-    def collate_fn(samples: List[Tuple[Tensor, Tensor]]) -> List[Tensor]:
-        img_batch = torch.stack([sample[0] for sample in samples], 0)
-        density_map_batch = torch.stack([torch.from_numpy(sample[1]).unsqueeze(0) for sample in samples], 0)
-        return [img_batch, density_map_batch]
-
 train_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="train", min_crowd_size=50)
 valid_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="val", min_crowd_size=50)
 test_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="test", min_crowd_size=50)
 
-all_img_labels_df = pd.concat([
-    train_dataset.img_labels_df,
-    valid_dataset.img_labels_df,
-    test_dataset.img_labels_df
-])
-
-print("Train data set size:", len(train_dataset))
-print("Valid data set size:", len(valid_dataset))
-print("Test data set size:", len(test_dataset))
-print("Total size:", len(all_img_labels_df))
-
-train_dataset.img_labels_df.head()
-
-random_indices = np.random.choice(train_dataset.img_labels_df.index, 6)
-
-fig, ax = plt.subplots(3, 2, figsize=(16, 16))
-
-for i, index in enumerate(random_indices):
-    sample = train_dataset.img_labels_df.loc[index]
-    img = load_image(sample["img_path"])
-    gt_labels = sample["gt_labels"]
-    ax[i // 2, i % 2].imshow(draw_gt_labels(img, gt_labels))
-
-train_gt_labels = np.array([gt for gt_labels in train_dataset.img_labels_df["gt_labels"] for gt in gt_labels])
-valid_gt_labels = np.array([gt for gt_labels in valid_dataset.img_labels_df["gt_labels"] for gt in gt_labels])
-test_gt_labels = np.array([gt for gt_labels in test_dataset.img_labels_df["gt_labels"] for gt in gt_labels])
-all_gt_labels = np.concatenate([train_gt_labels, valid_gt_labels, test_gt_labels])
-
-print("Total number of train annotations:", len(train_gt_labels))
-print("Total number of valid annotations:", len(valid_gt_labels))
-print("Total number of test annotations:", len(test_gt_labels))
-print("Total number of annotations:", len(all_gt_labels))
-
-train_occlusion_levels = dict(zip(*np.unique(train_gt_labels[:, 4], return_counts=True)))
-valid_occlusion_levels = dict(zip(*np.unique(valid_gt_labels[:, 4], return_counts=True)))
-test_occlusion_levels = dict(zip(*np.unique(test_gt_labels[:, 4], return_counts=True)))
-
-labels = ["Train", "Valid", "Test"]
-visible_counts = np.array([
-    train_occlusion_levels[1],
-    valid_occlusion_levels[1],
-    test_occlusion_levels[1]
-])
-partial_occlusion_counts = np.array([
-    train_occlusion_levels[2],
-    valid_occlusion_levels[2],
-    test_occlusion_levels[2]
-])
-full_occlusion_counts = np.array([
-    train_occlusion_levels[3],
-    valid_occlusion_levels[3],
-    test_occlusion_levels[3]
-])
-
-train_dataset.img_labels_df["count"].describe()
-
-valid_dataset.img_labels_df["count"].describe()
-
-test_dataset.img_labels_df["count"].describe()
-
-all_img_labels_df["count"].describe()
-
-img_resolutions = []
-for img_path in all_img_labels_df["img_path"]:
-    img = load_image(img_path)
-    img_resolutions.append(img.size)
-img_resolutions = np.array(img_resolutions)
-
-min_resolution = np.min(img_resolutions, axis=0)
-max_resolution = np.max(img_resolutions, axis=0)
-mean_resolution = np.mean(img_resolutions, axis=0, dtype=np.int32)
-median_resolution = np.median(img_resolutions, axis=0)
-
-print("Minimum image width:", min_resolution[0])
-print("Minimum image height:", min_resolution[1])
-print("Maximum image width:", max_resolution[0])
-print("Maximum image height:", max_resolution[1])
-print(f"Mean image resolution: {mean_resolution[0]}x{mean_resolution[1]}")
-print(f"Median image resolution: {median_resolution[0]}x{median_resolution[1]}")
-
-scene_types_counts = dict(zip(*np.unique(all_img_labels_df["scene_type"], return_counts=True)))
-
-for scene_type, count in scene_types_counts.items():
-    print(scene_type, ":", count, end=", ")
-
-    scene_types = np.array(list(scene_types_counts.keys()))
-scene_type_counts = np.array(list(scene_types_counts.values()))
 
 random_indices = np.random.randint(0, len(train_dataset), 6)
 
@@ -339,66 +252,5 @@ for i, index in enumerate(random_indices):
     ax[i // 2, i % 2].imshow(img)
     ax[i // 2, i % 2].imshow(density_map, cmap="jet", alpha=0.5)
 
-
-checkpoint_callback = ModelCheckpoint(
-    dirpath=CHECKPOINTS_DIR,
-    filename="crowdnet-{epoch:02d}-{valid_mae:.2f}",
-    monitor="valid_mae",
-    mode="min",
-    verbose=True,
-    save_top_k=5
-)
-trainer = pl.Trainer(
-    gpus=[0],
-    fast_dev_run=False,
-    max_epochs=50,
-    checkpoint_callback=True,
-    callbacks=[checkpoint_callback, MetricsCallback()],
-    deterministic=True,
-    progress_bar_refresh_rate=0,
-    num_sanity_val_steps=0
-)
-
-def count_from_density_map(density_map: np.ndarray) -> int:
-    return round(np.sum(np.clip(density_map, a_min=0, a_max=None)))
-
-def predict_density_map(img: Image.Image, model: nn.Module) -> np.ndarray:
-    img, resize_ratio = resize_img(img)
-    img_input = preprocess_transform(img).unsqueeze(dim=0)
-    density_map = model(img_input).detach().cpu().numpy()[0][0]
-    return density_map
-
-random_indices = np.random.randint(0, len(test_dataset), 10)
-
-fig, axes = plt.subplots(10, 3, figsize=(16, 32))
-
-column_names = ["image", "gt", "pred"]
-for ax, col in zip(axes[0], column_names):
-    ax.set_title(col)
-
-for i, index in enumerate(random_indices):
-    img, density_map = train_dataset[index]
-
-    gt_count = count_from_density_map(density_map)
-    density_map = scale_density_map(density_map, 8)
-    
-    
-    axes[i, 0].imshow(img)
-    axes[i, 1].imshow(density_map, cmap="jet")
-    
-    axes[i, 1].text(
-        x=4,
-        y=10,
-        s=f"GT count: {gt_count}",
-        bbox={"facecolor": "black", "alpha": 0.7, "pad": 4},
-        c="white",
-        weight="bold"
-    )
-    
-    axes[i, 2].text(
-        x=4,
-        y=10,
-        bbox={"facecolor": "black", "alpha": 0.7, "pad": 4},
-        c="white",
-        weight="bold"
-    )
+plt.show()
+print("done")
