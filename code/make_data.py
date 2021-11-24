@@ -242,24 +242,25 @@ train_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="train", 
 valid_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="val", min_crowd_size=50)
 test_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="test", min_crowd_size=50)
 
-plt.axis('off')
-plt.set_cmap('jet')
 
 for i, index in enumerate(train_dataset):
     img, density_map = train_dataset[i]
-    plt.imshow(density_map)
+    plt.axis('off')
+    plt.imshow(density_map, cmap='jet')
     plt.savefig(f'data/density/train/{i}', bbox_inches='tight', pad_inches = 0)
     plt.clf()
 
-# for i, index in enumerate(valid_dataset):
-#     img, density_map = valid_dataset[i]
-#     plt.imshow(density_map)
-#     plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
-#     plt.clf()
+for i, index in enumerate(valid_dataset):
+    img, density_map = valid_dataset[i]
+    plt.axis('off')
+    plt.imshow(density_map, cmap='jet')
+    plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
+    plt.clf()
 
 
-# for i, index in enumerate(test_dataset):
-#     img, density_map = test_dataset[i]
-#     plt.imshow(density_map)
-#     plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
-#     plt.clf()
+for i, index in enumerate(test_dataset):
+    img, density_map = test_dataset[i]
+    plt.axis('off')
+    plt.imshow(density_map, cmap='jet')
+    plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
+    plt.clf()
