@@ -247,17 +247,19 @@ plt.set_cmap('jet')
 
 for i, index in enumerate(train_dataset):
     img, density_map = train_dataset[i]
-
-    # Explicitly convert to range 0 ... 255 and uint8 type for saving
-    img = Image.fromarray(np.uint8(density_map * 255))
-    img.save(f'data/density/train/{i}.jpg')
+    plt.imshow(density_map)
+    plt.savefig(f'data/density/train/{i}', bbox_inches='tight', pad_inches = 0)
+    plt.clf()
 
 # for i, index in enumerate(valid_dataset):
 #     img, density_map = valid_dataset[i]
 #     plt.imshow(density_map)
 #     plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
+#     plt.clf()
+
 
 # for i, index in enumerate(test_dataset):
 #     img, density_map = test_dataset[i]
 #     plt.imshow(density_map)
 #     plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
+#     plt.clf()
