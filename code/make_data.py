@@ -2,7 +2,7 @@ import random
 from copy import deepcopy
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -242,15 +242,22 @@ train_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="train", 
 valid_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="val", min_crowd_size=50)
 test_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="test", min_crowd_size=50)
 
+plt.axis('off')
+plt.set_cmap('jet')
 
-random_indices = np.random.randint(0, len(train_dataset), 6)
+for i, index in enumerate(train_dataset):
+    img, density_map = train_dataset[i]
 
-fig, ax = plt.subplots(3, 2, figsize=(16, 16))
+    # Explicitly convert to range 0 ... 255 and uint8 type for saving
+    img = Image.fromarray(np.uint8(density_map * 255))
+    img.save(f'data/density/train/{i}.jpg')
 
-for i, index in enumerate(random_indices):
-    img, density_map = train_dataset[index]
-    ax[i // 2, i % 2].imshow(img)
-    ax[i // 2, i % 2].imshow(density_map, cmap="jet", alpha=0.5)
+# for i, index in enumerate(valid_dataset):
+#     img, density_map = valid_dataset[i]
+#     plt.imshow(density_map)
+#     plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
 
-plt.show()
-print("done")
+# for i, index in enumerate(test_dataset):
+#     img, density_map = test_dataset[i]
+#     plt.imshow(density_map)
+#     plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
