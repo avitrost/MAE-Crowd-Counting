@@ -4,16 +4,34 @@ import tensorflow as tf
 
 from mae import *
 from training_utils import *
+from helpers import get_image_paths, get_images_from_paths
 
+
+FREEZE_LAYERS = True
 MODEL_PATH = ''
 
 mae_model = keras.models.load_model(MODEL_PATH)
 
-(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
-(x_train, y_train), (x_val, y_val) = (
-    (x_train[:40000], y_train[:40000]),
-    (x_train[40000:], y_train[40000:]),
-)
+train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths() # Crowd dataset
+print('got paths')
+x_train = get_images_from_paths(train_image_paths)
+print('train images')
+y_train = get_images_from_paths(train_density_paths)
+print('train density')
+x_test = get_images_from_paths(test_image_paths)
+print('test images')
+y_test = get_images_from_paths(test_density_paths)
+print('test density')
+x_val = get_images_from_paths(val_image_paths)
+print('val images')
+y_val = get_images_from_paths(val_density_paths)
+print('val density')
+
+# (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+# (x_train, y_train), (x_val, y_val) = (
+#     (x_train[:40000], y_train[:40000]),
+#     (x_train[40000:], y_train[40000:]),
+# )
 print(f"Training samples: {len(x_train)}")
 print(f"Validation samples: {len(x_val)}")
 print(f"Testing samples: {len(x_test)}")
@@ -52,11 +70,13 @@ downstream_model = keras.Sequential(
         # layers.Dense(NUM_CLASSES, activation="softmax"),
     ],
     name="finetune_model",
+
 )
 
-# Only the final decoder layer of the `downstream_model` should be trainable.
-for layer in downstream_model.layers[:-1]:
-    layer.trainable = False
+# Only the final decoder layer of the `downstream_model` should be trainable if freezing layers
+if FREEZE_LAYERS:
+    for layer in downstream_model.layers[:-1]:
+        layer.trainable = False
 
 downstream_model.summary()
 
@@ -95,7 +115,7 @@ scheduled_lrs = WarmUpCosine(
 
 timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
-optimizer = keras.optimizers.SGD(learning_rate=scheduled_lrs, momentum=0.9)
+optimizer = keras.optimizers.Adam(learning_rate=scheduled_lrs)
 downstream_model.compile(
     optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
 )

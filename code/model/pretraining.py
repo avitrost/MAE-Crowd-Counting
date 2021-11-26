@@ -10,6 +10,7 @@ import random
 
 from mae import *
 from training_utils import *
+from helpers import get_image_paths, get_images_from_paths
 
 keras.backend.clear_session()
 
@@ -29,11 +30,20 @@ mae_model = MaskedAutoencoder(
     decoder=decoder,
 )
 
-(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
-(x_train, y_train), (x_val, y_val) = (
-    (x_train[:40000], y_train[:40000]),
-    (x_train[40000:], y_train[40000:]),
-)
+train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
+print('got paths')
+x_train = get_images_from_paths(train_image_paths)
+print('train')
+x_test = get_images_from_paths(test_image_paths)
+print('test')
+x_val = get_images_from_paths(val_image_paths)
+print('val')
+
+# (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+# (x_train, y_train), (x_val, y_val) = (
+#     (x_train[:40000], y_train[:40000]),
+#     (x_train[40000:], y_train[40000:]),
+# )
 print(f"Training samples: {len(x_train)}")
 print(f"Validation samples: {len(x_val)}")
 print(f"Testing samples: {len(x_test)}")
