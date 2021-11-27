@@ -9,7 +9,7 @@ import numpy as np
 import random
 
 # Setting seeds for reproducibility.
-SEED = 42
+SEED = 32
 tf.random.set_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
@@ -55,10 +55,10 @@ DEC_TRANSFORMER_UNITS = [
 def get_train_augmentation_model():
     model = keras.Sequential(
         [
-            layers.experimental.preprocessing.Rescaling(1 / 255.0),
-            layers.experimental.preprocessing.Resizing(INPUT_SHAPE[0] + 20, INPUT_SHAPE[0] + 20),
-            layers.experimental.preprocessing.RandomCrop(IMAGE_SIZE, IMAGE_SIZE),
-            layers.experimental.preprocessing.RandomFlip("horizontal"),
+            layers.Rescaling(1 / 255.0),
+            layers.Resizing(INPUT_SHAPE[0] + 20, INPUT_SHAPE[0] + 20),
+            layers.RandomCrop(IMAGE_SIZE, IMAGE_SIZE),
+            layers.RandomFlip("horizontal"),
         ],
         name="train_data_augmentation",
     )
@@ -67,7 +67,7 @@ def get_train_augmentation_model():
 
 def get_test_augmentation_model():
     model = keras.Sequential(
-        [layers.experimental.preprocessing.Rescaling(1 / 255.0), layers.experimental.preprocessing.Resizing(IMAGE_SIZE, IMAGE_SIZE),],
+        [layers.Rescaling(1 / 255.0), layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),],
         name="test_data_augmentation",
     )
     return model

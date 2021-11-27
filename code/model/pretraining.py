@@ -32,11 +32,11 @@ mae_model = MaskedAutoencoder(
 
 train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths)
+x_train = get_images_from_paths(train_image_paths[:10])
 print('train')
-x_test = get_images_from_paths(test_image_paths)
+x_test = get_images_from_paths(test_image_paths[:10])
 print('test')
-x_val = get_images_from_paths(val_image_paths)
+x_val = get_images_from_paths(val_image_paths[:10])
 print('val')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -102,7 +102,7 @@ class TrainMonitor(tf.keras.callbacks.Callback):
             ax[1].set_title(f"Masked: {epoch:03d}")
 
             ax[2].imshow(reconstructed_image)
-            ax[2].set_title(f"Resonstructed: {epoch:03d}")
+            ax[2].set_title(f"Reconstructed: {epoch:03d}")
 
             plt.show()
             plt.close()
