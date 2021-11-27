@@ -32,11 +32,11 @@ mae_model = MaskedAutoencoder(
 
 train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths[:10])
+x_train = get_images_from_paths(train_image_paths)
 print('train')
-x_test = get_images_from_paths(test_image_paths[:10])
+x_test = get_images_from_paths(test_image_paths)
 print('test')
-x_val = get_images_from_paths(val_image_paths[:10])
+x_val = get_images_from_paths(val_image_paths)
 print('val')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -89,6 +89,7 @@ class TrainMonitor(tf.keras.callbacks.Callback):
             )
             print(f"\nIdx chosen: {idx}")
             original_image = test_augmeneted_images[idx]
+            print(tf.math.reduce_max(original_image))
             masked_image = self.model.patch_layer.reconstruct_from_patch(
                 test_masked_patch
             )
@@ -104,8 +105,8 @@ class TrainMonitor(tf.keras.callbacks.Callback):
             ax[2].imshow(reconstructed_image)
             ax[2].set_title(f"Reconstructed: {epoch:03d}")
 
-            plt.show()
-            plt.close()
+            # plt.show()
+            # plt.close()
 
 
 total_steps = int((len(x_train) / BATCH_SIZE) * EPOCHS)
@@ -121,7 +122,7 @@ timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
 train_callbacks = [
     keras.callbacks.TensorBoard(log_dir=f"mae_logs_{timestamp}"),
-    TrainMonitor(epoch_interval=5),
+    TrainMonitor(epoch_interval=20),
 ]
 
 optimizer = tfa.optimizers.AdamW(learning_rate=scheduled_lrs, weight_decay=WEIGHT_DECAY)

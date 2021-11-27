@@ -55,7 +55,7 @@ DEC_TRANSFORMER_UNITS = [
 def get_train_augmentation_model():
     model = keras.Sequential(
         [
-            layers.Rescaling(1 / 255.0),
+            # layers.Rescaling(1 / 255.0),
             layers.Resizing(INPUT_SHAPE[0] + 20, INPUT_SHAPE[0] + 20),
             layers.RandomCrop(IMAGE_SIZE, IMAGE_SIZE),
             layers.RandomFlip("horizontal"),
@@ -67,7 +67,10 @@ def get_train_augmentation_model():
 
 def get_test_augmentation_model():
     model = keras.Sequential(
-        [layers.Rescaling(1 / 255.0), layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),],
+        [
+            # layers.Rescaling(1 / 255.0), 
+            layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),
+        ],
         name="test_data_augmentation",
     )
     return model

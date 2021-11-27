@@ -26,9 +26,7 @@ def get_image_paths():
 def get_images_from_paths(paths):
     images = []
     for path in paths:
-        image = imread(path)
+        image = imread(path)[...,::-1]
         image = resize(image, (RESIZE_SHAPE, RESIZE_SHAPE, 3))
         images.append(image)
-        plt.imshow(image)
-        plt.show()
     return images
