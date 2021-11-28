@@ -139,4 +139,6 @@ loss, mae = mae_model.evaluate(test_ds)
 print(f"Loss: {loss:.2f}")
 print(f"MAE: {mae:.2f}")
 
+mae_model.compute_output_shape(input_shape=(None, IMAGE_SIZE, IMAGE_SIZE, 3))
+
 mae_model.save(f"pretrain_{timestamp}", include_optimizer=False)
