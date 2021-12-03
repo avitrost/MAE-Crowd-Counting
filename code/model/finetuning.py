@@ -117,12 +117,12 @@ timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
 optimizer = keras.optimizers.Adam(learning_rate=scheduled_lrs)
 downstream_model.compile(
-    optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    optimizer=optimizer, loss=keras.losses.MeanSquaredError(), metrics=["mae"]
 )
 downstream_model.fit(train_ds, validation_data=val_ds, epochs=linear_probe_epochs)
 
-loss, accuracy = downstream_model.evaluate(test_ds)
-accuracy = round(accuracy * 100, 2)
-print(f"Accuracy on the test set: {accuracy}%.")
+loss, mae = downstream_model.evaluate(test_ds)
+result_mae = round(mae * 100, 2)
+print(f"mae on the test set: {result_mae}%.")
 
 downstream_model.save(f"finetune_{timestamp}", include_optimizer=False)

@@ -139,4 +139,16 @@ loss, mae = mae_model.evaluate(test_ds)
 print(f"Loss: {loss:.2f}")
 print(f"MAE: {mae:.2f}")
 
-mae_model.save(f"pretrain_{timestamp}", include_optimizer=False)
+extracted_encoder = keras.Sequential([
+    mae_model.patch_layer,
+    mae_model.patch_encoder,
+    mae_model.encoder
+])
+
+extracted_encoder.compile(
+    optimizer=optimizer, loss=keras.losses.MeanSquaredError(), metrics=["mae"]
+)
+
+extracted_encoder.build((None, IMAGE_SIZE, IMAGE_SIZE, 3))
+
+extracted_encoder.save(f"pretrain_{timestamp}", include_optimizer=False)
