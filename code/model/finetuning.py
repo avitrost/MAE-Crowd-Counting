@@ -46,24 +46,22 @@ test_ds = tf.data.Dataset.from_tensor_slices((x_test))
 test_ds = test_ds.batch(BATCH_SIZE).prefetch(AUTO)
 
 # Extract the augmentation layers.
-train_augmentation_model = mae_model.train_augmentation_model
-test_augmentation_model = mae_model.test_augmentation_model
+train_augmentation_model = get_train_augmentation_model()
+test_augmentation_model = get_test_augmentation_model()
 
-# Extract the patchers.
-patch_layer = mae_model.patch_layer
-patch_encoder = mae_model.patch_encoder
-patch_encoder.downstream = True  # Swtich the downstream flag to True.
+# # Extract the patchers.
+# patch_layer = mae_model.patch_layer
+# patch_encoder = mae_model.patch_encoder
+# patch_encoder.downstream = True  # Swtich the downstream flag to True.
 
-# Extract the encoder.
-encoder = mae_model.encoder
+# # Extract the encoder.
+# encoder = mae_model.encoder
 
 # Pack as a model.
 downstream_model = keras.Sequential(
     [
         layers.Input((IMAGE_SIZE, IMAGE_SIZE, 3)),
-        patch_layer,
-        patch_encoder,
-        encoder,
+        mae_model,
         layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
         layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
         create_decoder()
