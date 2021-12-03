@@ -9,7 +9,7 @@ import numpy as np
 import random
 
 # Setting seeds for reproducibility.
-SEED = 42
+SEED = 26
 tf.random.set_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
@@ -18,7 +18,7 @@ random.seed(SEED)
 BUFFER_SIZE = 1024
 BATCH_SIZE = 256
 AUTO = tf.data.AUTOTUNE
-INPUT_SHAPE = (128, 128, 3)
+INPUT_SHAPE = (72, 72, 3)
 NUM_CLASSES = 10
 
 # OPTIMIZER
@@ -29,7 +29,7 @@ WEIGHT_DECAY = 1e-4
 EPOCHS = 100
 
 # AUGMENTATION
-IMAGE_SIZE = 128  # We'll resize input images to this size.
+IMAGE_SIZE = 72  # We'll resize input images to this size.
 PATCH_SIZE = 6  # Size of the patches to be extract from the input images.
 NUM_PATCHES = (IMAGE_SIZE // PATCH_SIZE) ** 2
 MASK_PROPORTION = 0.75

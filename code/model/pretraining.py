@@ -66,7 +66,7 @@ class TrainMonitor(tf.keras.callbacks.Callback):
         self.epoch_interval = epoch_interval
 
     def on_epoch_end(self, epoch, logs=None):
-        if self.epoch_interval and epoch % self.epoch_interval == 0:
+        if self.epoch_interval and epoch % self.epoch_interval == 0 and epoch != 0:
             test_augmeneted_images = self.model.test_augmentation_model(test_images)
             test_patches = self.model.patch_layer(test_augmeneted_images)
             (
@@ -105,8 +105,8 @@ class TrainMonitor(tf.keras.callbacks.Callback):
             ax[2].imshow(reconstructed_image)
             ax[2].set_title(f"Reconstructed: {epoch:03d}")
 
-            # plt.show()
-            # plt.close()
+            plt.show()
+            plt.close()
 
 
 total_steps = int((len(x_train) / BATCH_SIZE) * EPOCHS)
@@ -122,7 +122,7 @@ timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
 train_callbacks = [
     keras.callbacks.TensorBoard(log_dir=f"mae_logs_{timestamp}"),
-    TrainMonitor(epoch_interval=20),
+    TrainMonitor(epoch_interval=99),
 ]
 
 optimizer = tfa.optimizers.AdamW(learning_rate=scheduled_lrs, weight_decay=WEIGHT_DECAY)

@@ -30,3 +30,6 @@ def get_images_from_paths(paths):
         image = resize(image, (RESIZE_SHAPE, RESIZE_SHAPE, 3))
         images.append(image)
     return images
+
+def count_from_density_map(density_map: np.ndarray) -> int:
+    return round(np.sum(np.clip(density_map, a_min=0, a_max=None)))
