@@ -26,10 +26,10 @@ LEARNING_RATE = 5e-3
 WEIGHT_DECAY = 1e-4
 
 # TRAINING
-EPOCHS = 100
+EPOCHS = 1
 
 # AUGMENTATION
-IMAGE_SIZE = 72  # We'll resize input images to this size.
+IMAGE_SIZE = 64  # We'll resize input images to this size.
 PATCH_SIZE = 6  # Size of the patches to be extract from the input images.
 NUM_PATCHES = (IMAGE_SIZE // PATCH_SIZE) ** 2
 MASK_PROPORTION = 0.75
