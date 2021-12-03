@@ -30,6 +30,8 @@ mae_model = MaskedAutoencoder(
     decoder=decoder,
 )
 
+mae_model = keras.Sequential(mae_model)
+
 train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
 print('got paths')
 x_train = get_images_from_paths(train_image_paths)
