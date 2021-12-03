@@ -7,24 +7,24 @@ from training_utils import *
 from helpers import get_image_paths, get_images_from_paths
 
 
-FREEZE_LAYERS = True
-MODEL_PATH = ''
+FREEZE_LAYERS = False
+MODEL_PATH = 'pretrain_211203-210321'
 
 mae_model = keras.models.load_model(MODEL_PATH)
 
 train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths)
+x_train = get_images_from_paths(train_image_paths[:1])
 print('train images')
-y_train = get_images_from_paths(train_density_paths)
+y_train = get_images_from_paths(train_density_paths[:1])
 print('train density')
-x_test = get_images_from_paths(test_image_paths)
+x_test = get_images_from_paths(test_image_paths[:1])
 print('test images')
-y_test = get_images_from_paths(test_density_paths)
+y_test = get_images_from_paths(test_density_paths[:1])
 print('test density')
-x_val = get_images_from_paths(val_image_paths)
+x_val = get_images_from_paths(val_image_paths[:1])
 print('val images')
-y_val = get_images_from_paths(val_density_paths)
+y_val = get_images_from_paths(val_density_paths[:1])
 print('val density')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -64,7 +64,7 @@ downstream_model = keras.Sequential(
         mae_model,
         layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
         layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
-        create_decoder()
+        # create_decoder()
         # layers.Dense(NUM_CLASSES, activation="softmax"),
     ],
     name="finetune_model",

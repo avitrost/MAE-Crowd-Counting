@@ -139,9 +139,13 @@ loss, mae = mae_model.evaluate(test_ds)
 print(f"Loss: {loss:.2f}")
 print(f"MAE: {mae:.2f}")
 
+patch_encoder = mae_model.patch_encoder
+
+patch_encoder.downstream = True
+
 extracted_encoder = keras.Sequential([
     mae_model.patch_layer,
-    mae_model.patch_encoder,
+    patch_encoder,
     mae_model.encoder
 ])
 
