@@ -334,6 +334,9 @@ class MaskedAutoencoder(keras.Model):
         self.encoder = encoder
         self.decoder = decoder
 
+    def call(self, inputs):
+        return inputs # To make model able to save
+
     def calculate_loss(self, images, test=False):
         # Augment the input images.
         if test:

@@ -30,8 +30,6 @@ mae_model = MaskedAutoencoder(
     decoder=decoder,
 )
 
-mae_model = keras.Sequential(mae_model)
-
 train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
 print('got paths')
 x_train = get_images_from_paths(train_image_paths)
@@ -140,7 +138,5 @@ history = mae_model.fit(
 loss, mae = mae_model.evaluate(test_ds)
 print(f"Loss: {loss:.2f}")
 print(f"MAE: {mae:.2f}")
-
-mae_model.compute_output_shape(input_shape=(None, IMAGE_SIZE, IMAGE_SIZE, 3))
 
 mae_model.save(f"pretrain_{timestamp}", include_optimizer=False)
