@@ -5,8 +5,9 @@ import numpy as np
 from cv2 import imread
 from skimage.transform import resize
 import matplotlib.pyplot as plt
+from mae import *
 
-RESIZE_SHAPE = 256
+RESIZE_SHAPE = IMAGE_SIZE
 
 def get_image_paths():
     """
@@ -18,9 +19,9 @@ def get_image_paths():
     train_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/train/images/*.jpg')
     test_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/test/images/*.jpg')
     val_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/val/images/*.jpg')
-    train_density_paths = glob.glob('../../utils/data/density/train/*.jpg')
-    test_density_paths = glob.glob('../../utils/data/density/test/*.jpg')    
-    val_density_paths = glob.glob('../../utils/data/density/val/*.jpg')
+    train_density_paths = glob.glob('../../utils/data/density/train/*.png')
+    test_density_paths = glob.glob('../../utils/data/density/test/*.png')    
+    val_density_paths = glob.glob('../../utils/data/density/val/*.png')
     return train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths
 
 def get_images_from_paths(paths):

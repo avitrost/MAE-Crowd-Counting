@@ -18,7 +18,6 @@ random.seed(SEED)
 BUFFER_SIZE = 1024
 BATCH_SIZE = 256
 AUTO = tf.data.AUTOTUNE
-INPUT_SHAPE = (72, 72, 3)
 NUM_CLASSES = 10
 
 # OPTIMIZER
@@ -26,7 +25,7 @@ LEARNING_RATE = 5e-3
 WEIGHT_DECAY = 1e-4
 
 # TRAINING
-EPOCHS = 1
+EPOCHS = 100
 
 # AUGMENTATION
 IMAGE_SIZE = 64  # We'll resize input images to this size.
@@ -56,7 +55,7 @@ def get_train_augmentation_model():
     model = keras.Sequential(
         [
             # layers.Rescaling(1 / 255.0),
-            layers.Resizing(INPUT_SHAPE[0] + 20, INPUT_SHAPE[0] + 20),
+            layers.Resizing(IMAGE_SIZE + 20, IMAGE_SIZE + 20),
             layers.RandomCrop(IMAGE_SIZE, IMAGE_SIZE),
             layers.RandomFlip("horizontal"),
         ],

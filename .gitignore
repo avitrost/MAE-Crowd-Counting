@@ -130,3 +130,7 @@ dmypy.json
 
 utils/data
 utils/cache
+code/cache
+code/model/__pycache__
+code/model/saved_models
+code/model/logs

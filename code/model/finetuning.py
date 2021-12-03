@@ -7,24 +7,24 @@ from training_utils import *
 from helpers import get_image_paths, get_images_from_paths
 
 
-FREEZE_LAYERS = False
+FREEZE_LAYERS = True
 MODEL_PATH = 'pretrain_211203-210321'
 
 mae_model = keras.models.load_model(MODEL_PATH)
 
 train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths[:1])
+x_train = get_images_from_paths(train_image_paths)
 print('train images')
-y_train = get_images_from_paths(train_density_paths[:1])
+y_train = get_images_from_paths(train_density_paths)
 print('train density')
-x_test = get_images_from_paths(test_image_paths[:1])
+x_test = get_images_from_paths(test_image_paths)
 print('test images')
-y_test = get_images_from_paths(test_density_paths[:1])
+y_test = get_images_from_paths(test_density_paths)
 print('test density')
-x_val = get_images_from_paths(val_image_paths[:1])
+x_val = get_images_from_paths(val_image_paths)
 print('val images')
-y_val = get_images_from_paths(val_density_paths[:1])
+y_val = get_images_from_paths(val_density_paths)
 print('val density')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -35,6 +35,7 @@ print('val density')
 print(f"Training samples: {len(x_train)}")
 print(f"Validation samples: {len(x_val)}")
 print(f"Testing samples: {len(x_test)}")
+print(f"training maps: {len(y_train)}")
 
 train_ds = tf.data.Dataset.from_tensor_slices((x_train))
 train_ds = train_ds.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(AUTO)
@@ -63,8 +64,8 @@ downstream_model = keras.Sequential(
         layers.Input((IMAGE_SIZE, IMAGE_SIZE, 3)),
         mae_model,
         layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
-        layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
-        # create_decoder()
+        # layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
+        create_decoder()
         # layers.Dense(NUM_CLASSES, activation="softmax"),
     ],
     name="finetune_model",
@@ -95,7 +96,7 @@ def prepare_data(images, labels, is_train=True):
 
 
 train_ds = prepare_data(x_train, y_train)
-val_ds = prepare_data(x_train, y_train, is_train=False)
+val_ds = prepare_data(x_val, y_val, is_train=False)
 test_ds = prepare_data(x_test, y_test, is_train=False)
 
 linear_probe_epochs = 50
@@ -123,4 +124,4 @@ loss, mae = downstream_model.evaluate(test_ds)
 result_mae = round(mae * 100, 2)
 print(f"mae on the test set: {result_mae}%.")
 
-downstream_model.save(f"finetune_{timestamp}", include_optimizer=False)
+downstream_model.save(f"saved_models/finetune_{timestamp}", include_optimizer=False)

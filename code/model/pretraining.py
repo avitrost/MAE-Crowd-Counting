@@ -32,11 +32,11 @@ mae_model = MaskedAutoencoder(
 
 train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths[:1])
+x_train = get_images_from_paths(train_image_paths)
 print('train')
-x_test = get_images_from_paths(test_image_paths[:1])
+x_test = get_images_from_paths(test_image_paths)
 print('test')
-x_val = get_images_from_paths(val_image_paths[:1])
+x_val = get_images_from_paths(val_image_paths)
 print('val')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -121,8 +121,8 @@ scheduled_lrs = WarmUpCosine(
 timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
 train_callbacks = [
-    keras.callbacks.TensorBoard(log_dir=f"mae_logs_{timestamp}"),
-    TrainMonitor(epoch_interval=99),
+    keras.callbacks.TensorBoard(log_dir=f"logs/mae_logs_{timestamp}"),
+    TrainMonitor(epoch_interval=25),
 ]
 
 optimizer = tfa.optimizers.AdamW(learning_rate=scheduled_lrs, weight_decay=WEIGHT_DECAY)
@@ -155,4 +155,4 @@ extracted_encoder.compile(
 
 extracted_encoder.build((None, IMAGE_SIZE, IMAGE_SIZE, 3))
 
-extracted_encoder.save(f"pretrain_{timestamp}", include_optimizer=False)
+extracted_encoder.save(f"saved_models/pretrain_{timestamp}", include_optimizer=False)
