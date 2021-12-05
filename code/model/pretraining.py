@@ -1,3 +1,4 @@
+from code.model.helpers import get_images_from_file
 from tensorflow.keras import layers
 import tensorflow_addons as tfa
 from tensorflow import keras
@@ -30,13 +31,16 @@ mae_model = MaskedAutoencoder(
     decoder=decoder,
 )
 
-train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
-print('got paths')
-x_train = get_images_from_paths(train_image_paths)
+#train_image_paths, test_image_paths, val_image_paths, _, _, _ = get_image_paths() # Crowd dataset
+#print('got paths')
+#x_train = get_images_from_paths(train_image_paths)
+x_train = get_images_from_file('train')
 print('train')
-x_test = get_images_from_paths(test_image_paths)
+#x_test = get_images_from_paths(test_image_paths)
+x_test = get_images_from_file('test')
 print('test')
-x_val = get_images_from_paths(val_image_paths)
+#x_val = get_images_from_paths(val_image_paths)
+x_val = get_images_from_file('val')
 print('val')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()

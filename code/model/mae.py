@@ -9,7 +9,7 @@ import numpy as np
 import random
 
 # Setting seeds for reproducibility.
-SEED = 26
+SEED = 13
 tf.random.set_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
