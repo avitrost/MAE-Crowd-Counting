@@ -4,27 +4,27 @@ import tensorflow as tf
 
 from mae import *
 from training_utils import *
-from helpers import get_image_paths, get_images_from_paths
+from helpers import get_image_paths, get_images_from_paths, get_images_from_file
 
 
 FREEZE_LAYERS = True
-MODEL_PATH = 'pretrain_211203-210321'
+MODEL_PATH = 'saved_models\pretrain_211207-044414'
 
 mae_model = keras.models.load_model(MODEL_PATH)
 
 train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths() # Crowd dataset
 print('got paths')
-x_train = get_images_from_paths(train_image_paths)
+x_train = get_images_from_file('train')
 print('train images')
-y_train = get_images_from_paths(train_density_paths)
+y_train = get_images_from_file('train_density')
 print('train density')
-x_test = get_images_from_paths(test_image_paths)
+x_test = get_images_from_file('test')
 print('test images')
-y_test = get_images_from_paths(test_density_paths)
+y_test = get_images_from_file('test_density')
 print('test density')
-x_val = get_images_from_paths(val_image_paths)
+x_val = get_images_from_file('val')
 print('val images')
-y_val = get_images_from_paths(val_density_paths)
+y_val = get_images_from_file('val_density')
 print('val density')
 
 # (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -49,6 +49,8 @@ test_ds = test_ds.batch(BATCH_SIZE).prefetch(AUTO)
 # Extract the augmentation layers.
 train_augmentation_model = get_train_augmentation_model()
 test_augmentation_model = get_test_augmentation_model()
+
+test_images = next(iter(test_ds))
 
 # # Extract the patchers.
 # patch_layer = mae_model.patch_layer
@@ -99,7 +101,7 @@ train_ds = prepare_data(x_train, y_train)
 val_ds = prepare_data(x_val, y_val, is_train=False)
 test_ds = prepare_data(x_test, y_test, is_train=False)
 
-linear_probe_epochs = 50
+linear_probe_epochs = 100
 linear_prob_lr = 0.1
 warm_epoch_percentage = 0.1
 steps = int((len(x_train) // BATCH_SIZE) * linear_probe_epochs)
@@ -114,11 +116,16 @@ scheduled_lrs = WarmUpCosine(
 
 timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
+train_callbacks = [
+    keras.callbacks.TensorBoard(log_dir=f"logs/mae_logs_{timestamp}"),
+    #TrainMonitor(test_images, epoch_interval=10),
+]
+
 optimizer = keras.optimizers.Adam(learning_rate=scheduled_lrs)
 downstream_model.compile(
     optimizer=optimizer, loss=keras.losses.MeanSquaredError(), metrics=["mae"]
 )
-downstream_model.fit(train_ds, validation_data=val_ds, epochs=linear_probe_epochs)
+downstream_model.fit(train_ds, validation_data=val_ds, epochs=linear_probe_epochs, callbacks=train_callbacks)
 
 loss, mae = downstream_model.evaluate(test_ds)
 result_mae = round(mae * 100, 2)

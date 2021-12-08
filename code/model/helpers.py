@@ -93,3 +93,12 @@ def get_images_from_file(type):
         return np.load('test_images64x64.npy')
     if type == 'val':
         return np.load('val_images64x64.npy')
+    if type == 'train_density':
+        return np.load('train_density64x64.npy')
+    if type == 'test_density':
+        return np.load('test_density64x64.npy')
+    if type == 'val_density':
+        return np.load('val_density64x64.npy')
+
+if __name__ == "__main__":
+    save_numpy(64)

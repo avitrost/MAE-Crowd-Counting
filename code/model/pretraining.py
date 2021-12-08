@@ -1,4 +1,3 @@
-from code.model.helpers import get_images_from_file
 from tensorflow.keras import layers
 import tensorflow_addons as tfa
 from tensorflow import keras
@@ -11,7 +10,7 @@ import random
 
 from mae import *
 from training_utils import *
-from helpers import get_image_paths, get_images_from_paths
+from helpers import get_image_paths, get_images_from_paths, get_images_from_file
 
 keras.backend.clear_session()
 
@@ -126,7 +125,7 @@ timestamp = datetime.utcnow().strftime("%y%m%d-%H%M%S")
 
 train_callbacks = [
     keras.callbacks.TensorBoard(log_dir=f"logs/mae_logs_{timestamp}"),
-    TrainMonitor(epoch_interval=25),
+    TrainMonitor(epoch_interval=1000),
 ]
 
 optimizer = tfa.optimizers.AdamW(learning_rate=scheduled_lrs, weight_decay=WEIGHT_DECAY)
