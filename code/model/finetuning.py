@@ -8,7 +8,7 @@ from helpers import get_image_paths, get_images_from_paths, get_images_from_file
 
 
 FREEZE_LAYERS = True
-MODEL_PATH = 'saved_models\pretrain_211207-044414'
+MODEL_PATH = 'saved_models\pretrain_211208-060647'
 
 mae_model = keras.models.load_model(MODEL_PATH)
 

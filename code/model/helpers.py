@@ -19,9 +19,9 @@ def get_image_paths():
     train_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/train/images/*.jpg')
     test_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/test/images/*.jpg')
     val_image_paths = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/val/images/*.jpg')
-    train_density_paths = glob.glob('../../utils/data/density/train/*.png')
-    test_density_paths = glob.glob('../../utils/data/density/test/*.png')    
-    val_density_paths = glob.glob('../../utils/data/density/val/*.png')
+    train_density_paths = sorted(glob.glob('../../utils/data/density/train/*.png'), key=len)
+    test_density_paths = sorted(glob.glob('../../utils/data/density/test/*.png'), key=len)
+    val_density_paths = sorted(glob.glob('../../utils/data/density/val/*.png'), key=len)
     return train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths
 
 def get_images_from_paths(paths):
@@ -37,30 +37,30 @@ def count_from_density_map(density_map: np.ndarray) -> int:
 
 def save_numpy(size):
     train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
-    images = []
-    for i, path in enumerate(train_image_paths):  
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'train_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
-    images = []
-    for i, path in enumerate(test_image_paths):
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'test_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
-    images = []
-    for i, path in enumerate(val_image_paths):
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'val_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(train_image_paths):  
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'train_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(test_image_paths):
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'test_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(val_image_paths):
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'val_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
     images = []
     for i, path in enumerate(train_density_paths):
         print(i)
@@ -101,4 +101,6 @@ def get_images_from_file(type):
         return np.load('val_density64x64.npy')
 
 if __name__ == "__main__":
+    #train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
+    #print(test_density_paths)
     save_numpy(64)

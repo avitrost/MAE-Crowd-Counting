@@ -9,14 +9,14 @@ import numpy as np
 import random
 
 # Setting seeds for reproducibility.
-SEED = 26
+SEED = 13
 tf.random.set_seed(SEED)
 np.random.seed(SEED)
 random.seed(SEED)
 
 # DATA
 BUFFER_SIZE = 1024
-BATCH_SIZE = 256
+BATCH_SIZE = 16
 AUTO = tf.data.AUTOTUNE
 NUM_CLASSES = 10
 
