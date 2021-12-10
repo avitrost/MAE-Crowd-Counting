@@ -1,4 +1,3 @@
-
 import os
 import glob
 import numpy as np
@@ -100,7 +99,26 @@ def get_images_from_file(type):
     if type == 'val_density':
         return np.load('val_density64x64.npy')
 
-if __name__ == "__main__":
-    #train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
-    #print(test_density_paths)
-    save_numpy(64)
+# if __name__ == "__main__":
+#     #train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
+#     #print(test_density_paths)
+#     save_numpy(64)
+
+def get_count_from_numpy():
+    train_density_paths = sorted(glob.glob('../../utils/data/density_v2.0/train/*.npy'), key=len)
+    test_density_paths = sorted(glob.glob('../../utils/data/density_v2.0/test/*.npy'), key=len)
+    val_density_paths = sorted(glob.glob('../../utils/data/density_v2.0/val/*.npy'), key=len)
+
+    for i, path in enumerate(train_density_paths):
+        density_map = np.load(path)
+
+        c = count_from_density_map(density_map)
+
+        plt.title('count=%i' %c)
+
+        plt.axis('off')
+        plt.imshow(density_map, cmap='jet')
+        plt.show()
+        plt.clf()
+
+get_count_from_numpy()
