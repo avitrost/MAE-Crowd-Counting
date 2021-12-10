@@ -7,10 +7,12 @@ from training_utils import *
 from helpers import get_image_paths, get_images_from_paths, get_images_from_file
 
 
-FREEZE_LAYERS = False
+FREEZE_LAYERS = True
 MODEL_PATH = 'saved_models\pretrain_211207-044414'
 
-mae_model = keras.models.load_model(MODEL_PATH)
+# mae_model = keras.models.load_model(MODEL_PATH)
+
+mae_model = keras.models.load_model('../../utils/data/linear_probe_211122-042717')
 
 train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths() # Crowd dataset
 print('got paths')
@@ -53,18 +55,22 @@ test_augmentation_model = get_test_augmentation_model()
 test_images = next(iter(test_ds))
 
 # # Extract the patchers.
-# patch_layer = mae_model.patch_layer
-# patch_encoder = mae_model.patch_encoder
-# patch_encoder.downstream = True  # Swtich the downstream flag to True.
+mae_model.summary()
+print(mae_model.layers)
+patch_layer = mae_model.get_layer('patches')
+patch_encoder = mae_model.get_layer('patch_encoder')
+patch_encoder.downstream = True  # Swtich the downstream flag to True.
 
 # # Extract the encoder.
-# encoder = mae_model.encoder
+encoder = mae_model.get_layer('mae_encoder')
 
 # Pack as a model.
 downstream_model = keras.Sequential(
     [
         layers.Input((IMAGE_SIZE, IMAGE_SIZE, 3)),
-        mae_model,
+        patch_layer,
+        patch_encoder,
+        encoder,
         # layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
         # layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
         create_decoder()
@@ -101,7 +107,7 @@ train_ds = prepare_data(x_train, y_train)
 val_ds = prepare_data(x_val, y_val, is_train=False)
 test_ds = prepare_data(x_test, y_test, is_train=False)
 
-linear_probe_epochs = 8
+linear_probe_epochs = 10
 linear_prob_lr = 0.1
 warm_epoch_percentage = 0.1
 steps = int((len(x_train) // BATCH_SIZE) * linear_probe_epochs)

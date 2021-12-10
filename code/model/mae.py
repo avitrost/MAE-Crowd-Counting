@@ -28,7 +28,7 @@ WEIGHT_DECAY = 1e-4
 EPOCHS = 400
 
 # AUGMENTATION
-IMAGE_SIZE = 64  # We'll resize input images to this size.
+IMAGE_SIZE = 48  # We'll resize input images to this size.
 PATCH_SIZE = 6  # Size of the patches to be extract from the input images.
 NUM_PATCHES = (IMAGE_SIZE // PATCH_SIZE) ** 2
 MASK_PROPORTION = 0.75

@@ -242,25 +242,52 @@ train_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="train", 
 valid_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="val", min_crowd_size=0)
 test_dataset = JHUCrowdDataset(dataset_root=DATASET_ROOT, subset_name="test", min_crowd_size=0)
 
+# for i, index in enumerate(train_dataset):
+#     img, density_map = train_dataset[i]
+#     plt.axis('off')
+#     plt.imshow(density_map, cmap='jet')
+#     plt.savefig(f'data/density/train/{i}', bbox_inches='tight', pad_inches = 0)
+#     plt.clf()
+
+# for i, index in enumerate(valid_dataset):
+#     img, density_map = valid_dataset[i]
+#     plt.axis('off')
+#     plt.imshow(density_map, cmap='jet')
+#     plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
+#     plt.clf()
+
+
+# for i, index in enumerate(test_dataset):
+#     img, density_map = test_dataset[i]
+#     plt.axis('off')
+#     plt.imshow(density_map, cmap='jet')
+#     plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
+#     plt.clf()
 
 for i, index in enumerate(train_dataset):
     img, density_map = train_dataset[i]
-    plt.axis('off')
-    plt.imshow(density_map, cmap='jet')
-    plt.savefig(f'data/density/train/{i}', bbox_inches='tight', pad_inches = 0)
-    plt.clf()
-
-for i, index in enumerate(valid_dataset):
-    img, density_map = valid_dataset[i]
-    plt.axis('off')
-    plt.imshow(density_map, cmap='jet')
-    plt.savefig(f'data/density/val/{i}', bbox_inches='tight', pad_inches = 0)
-    plt.clf()
-
+    np.save(f'data/density_v2.0/train/{i}', density_map)
 
 for i, index in enumerate(test_dataset):
     img, density_map = test_dataset[i]
-    plt.axis('off')
-    plt.imshow(density_map, cmap='jet')
-    plt.savefig(f'data/density/test/{i}', bbox_inches='tight', pad_inches = 0)
-    plt.clf()
+    np.save(f'data/density_v2.0/test/{i}', density_map)
+
+for i, index in enumerate(valid_dataset):
+    img, density_map = valid_dataset[i]
+    np.save(f'data/density_v2.0/val/{i}', density_map)
+
+# def get_counts():
+#     for i, index in enumerate(train_dataset):
+#         img, density_map = train_dataset[i]
+#         c = round(np.sum(np.clip(density_map, a_min=0, a_max=None)))
+
+#         plt.title('count=%i' %c)
+
+#         plt.axis('off')
+#         plt.imshow(density_map, cmap='jet')
+#         plt.show()
+#         plt.clf()
+    
+#     print("image")
+
+# get_counts()
