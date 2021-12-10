@@ -7,8 +7,8 @@ from training_utils import *
 from helpers import get_image_paths, get_images_from_paths, get_images_from_file
 
 
-FREEZE_LAYERS = True
-MODEL_PATH = 'saved_models\pretrain_211208-060647'
+FREEZE_LAYERS = False
+MODEL_PATH = 'saved_models\pretrain_211207-044414'
 
 mae_model = keras.models.load_model(MODEL_PATH)
 
@@ -65,7 +65,7 @@ downstream_model = keras.Sequential(
     [
         layers.Input((IMAGE_SIZE, IMAGE_SIZE, 3)),
         mae_model,
-        layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
+        # layers.BatchNormalization(),  # Refer to A.1 (Linear probing)
         # layers.GlobalAveragePooling1D(), # This extracts the representations learned from encoder since there's no CLS token
         create_decoder()
         # layers.Dense(NUM_CLASSES, activation="softmax"),
@@ -101,7 +101,7 @@ train_ds = prepare_data(x_train, y_train)
 val_ds = prepare_data(x_val, y_val, is_train=False)
 test_ds = prepare_data(x_test, y_test, is_train=False)
 
-linear_probe_epochs = 100
+linear_probe_epochs = 8
 linear_prob_lr = 0.1
 warm_epoch_percentage = 0.1
 steps = int((len(x_train) // BATCH_SIZE) * linear_probe_epochs)
@@ -121,7 +121,7 @@ train_callbacks = [
     #TrainMonitor(test_images, epoch_interval=10),
 ]
 
-optimizer = keras.optimizers.Adam(learning_rate=scheduled_lrs)
+optimizer = keras.optimizers.SGD(learning_rate=scheduled_lrs, momentum=0.9)
 downstream_model.compile(
     optimizer=optimizer, loss=keras.losses.MeanSquaredError(), metrics=["mae"]
 )
