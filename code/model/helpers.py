@@ -36,30 +36,30 @@ def count_from_density_map(density_map: np.ndarray) -> int:
 
 def save_numpy(size):
     train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
-    images = []
-    for i, path in enumerate(train_image_paths):  
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'train_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
-    images = []
-    for i, path in enumerate(test_image_paths):
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'test_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
-    images = []
-    for i, path in enumerate(val_image_paths):
-        print(i)
-        image = imread(path)[...,::-1]
-        image = resize(image, (size, size, 3))
-        images.append(image)
-    filename = 'val_images' + str(size) + 'x' + str(size) + '.npy'
-    np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(train_image_paths):  
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'train_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(test_image_paths):
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'test_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
+    # images = []
+    # for i, path in enumerate(val_image_paths):
+    #     print(i)
+    #     image = imread(path)[...,::-1]
+    #     image = resize(image, (size, size, 3))
+    #     images.append(image)
+    # filename = 'val_images' + str(size) + 'x' + str(size) + '.npy'
+    # np.save(filename, images)
     images = []
     for i, path in enumerate(train_density_paths):
         print(i)
@@ -87,17 +87,17 @@ def save_numpy(size):
 
 def get_images_from_file(type):
     if type == 'train':
-        return np.load('train_images64x64.npy')
+        return np.load('train_images48x48.npy')
     if type == 'test':
-        return np.load('test_images64x64.npy')
+        return np.load('test_images48x48.npy')
     if type == 'val':
-        return np.load('val_images64x64.npy')
+        return np.load('val_images48x48.npy')
     if type == 'train_density':
-        return np.load('train_density64x64.npy')
+        return np.load('train_density48x48.npy')
     if type == 'test_density':
-        return np.load('test_density64x64.npy')
+        return np.load('test_density48x48.npy')
     if type == 'val_density':
-        return np.load('val_density64x64.npy')
+        return np.load('val_density48x48.npy')
 # if __name__ == "__main__":
 #     #train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
 #     #print(test_density_paths)
@@ -120,8 +120,45 @@ def get_count_from_numpy():
         plt.show()
         plt.clf()
 
+def save_ground_truths():
+    train_path = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/train/image_labels.txt')
+    test_path = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/test/image_labels.txt')
+    val_path = glob.glob('../../utils/data/eset/jhu_crowd_v2.0/val/image_labels.txt')
+    train = open(train_path[0], 'r')
+    lines = train.readlines()
+    gts = []
+    for line in lines:
+        print(float(line.split(',')[1]))
+        gts.append(float(line.split(',')[1]))
+    print(np.max(gts))
+    print(np.min(gts))
+    print(np.mean(gts))
+    print(np.var(gts))
+    np.save('train_gt.npy', gts)
+    test = open(test_path[0], 'r')
+    lines = test.readlines()
+    gts = []
+    for line in lines:
+        gts.append(float(line.split(',')[1]))
+    np.save('test_gt.npy', gts)
+    val = open(val_path[0], 'r')
+    lines = val.readlines()
+    gts = []
+    for line in lines:
+        gts.append(float(line.split(',')[1]))
+    np.save('val_gt.npy', gts)
+
+def get_ground_truths(type):
+    if type == 'train':
+        return np.load('train_gt.npy')
+    if type == 'test':
+        return np.load('test_gt.npy')
+    if type == 'val':
+        return np.load('val_gt.npy')
+
 if __name__ == "__main__":
     #train_image_paths, test_image_paths, val_image_paths, train_density_paths, test_density_paths, val_density_paths = get_image_paths()
     #print(test_density_paths)
-    get_count_from_numpy()
-    save_numpy(48)
+    #save_numpy(48)
+    save_ground_truths()
+

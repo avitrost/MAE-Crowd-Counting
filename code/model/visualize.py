@@ -4,16 +4,17 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
-TIMESTAMP = '211207-044414' #edit timestamp here
+TIMESTAMP = '211210-051339' #edit timestamp here
 
-model = keras.models.load_model(f'saved_models/pretrain_{TIMESTAMP}')
-x = np.load('test_images64x64.npy')
-y = np.load('test_density64x64.npy')
+# model = keras.models.load_model(f'saved_models/pretrain{TIMESTAMP}')
+model = keras.models.load_model('../../code/model/saved_models/finetune_211210-051339')
+
+x = np.load('test_images48x48.npy')
+y = np.load('test_density48x48.npy')
 print(x.shape)
 print(y.shape)
 input = x
 output = y
-
 model_out = model.predict(x)
 for i in range(1600):
     f, axarr = plt.subplots(1, 3)
